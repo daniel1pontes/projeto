@@ -1,0 +1,111 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Usuario {
+  id        String   @id @default(cuid())
+  nome      String
+  email     String   @unique
+  senha     String
+  telefone  String?
+  papel     PapelUsuario @default(RECEPCIONISTA)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relacionamentos
+  fisioterapeuta Fisioterapeuta?
+  recepcionista  Recepcionista?
+
+  @@map("usuarios")
+}
+
+model Fisioterapeuta {
+  id           String   @id @default(cuid())
+  usuarioId    String   @unique
+  crefito      String   @unique
+  especialidade String
+  ativo        Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  // Relacionamentos
+  usuario      Usuario @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
+  consultas    Consulta[]
+
+  @@map("fisioterapeutas")
+}
+
+model Recepcionista {
+  id        String   @id @default(cuid())
+  usuarioId String   @unique
+  ativo     Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relacionamentos
+  usuario Usuario @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
+
+  @@map("recepcionistas")
+}
+
+model Paciente {
+  id             String   @id @default(cuid())
+  nome           String
+  email          String?  @unique
+  cpf            String   @unique
+  telefone       String
+  dataNascimento DateTime
+  convenio       String?
+  historico      String?
+  ativo          Boolean  @default(true)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  // Relacionamentos
+  consultas Consulta[]
+
+  @@map("pacientes")
+}
+
+model Consulta {
+  id          String        @id @default(cuid())
+  pacienteId  String
+  fisioterapeutaId String
+  dataHora    DateTime
+  duracao     Int           @default(60) // minutos
+  status      StatusConsulta @default(AGENDADA)
+  observacoes String?
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+
+  // Relacionamentos
+  paciente       Paciente @relation(fields: [pacienteId], references: [id])
+  fisioterapeuta Fisioterapeuta @relation(fields: [fisioterapeutaId], references: [id])
+
+  @@unique([pacienteId, dataHora])
+  @@unique([fisioterapeutaId, dataHora])
+  @@map("consultas")
+}
+
+enum PapelUsuario {
+  ADMIN
+  FISIOTERAPEUTA
+  RECEPCIONISTA
+}
+
+enum StatusConsulta {
+  AGENDADA
+  CONFIRMADA
+  EM_ANDAMENTO
+  CONCLUIDA
+  CANCELADA
+  NAO_COMPARECEU
+}
