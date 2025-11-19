@@ -1,0 +1,48 @@
+# Root level ignores
+.env
+.env.local
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Editor directories and files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Logs
+logs/
+*.log
+
+# Temporary folders
+tmp/
+temp/
+
+# Docker
+.dockerignore
+
+# Database
+*.db
+*.sqlite
+*.sqlite3
+
+# Build artifacts
+build/
+dist/
+
+# Coverage reports
+coverage/
+*.lcov
+
+# Test results
+test-results/
+playwright-report/
+test-results.xml
